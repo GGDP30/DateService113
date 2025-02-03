@@ -144,25 +144,35 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 						key={rowIndex}
 						className="flex"
 					>
-						{days.slice(rowIndex * 7, rowIndex * 7 + 7).map((day) => {
+						{days.slice(rowIndex * 7, rowIndex * 7 + 7).map((day, colIndex, rowArray) => {
 							const isDisabled = isDateDisabled(day);
 							const isSelectedStart = isSameDay(day, range.start);
 							const isSelectedEnd = isSameDay(day, range.end);
 							const isInRange = range.start && range.end && isWithinInterval(day, {start: range.start, end: range.end});
 
+							// Bordes redondeados para los extremos de cada fila
+							const isFirstInRow = colIndex === 0;
+							const isLastInRow = colIndex === rowArray.length - 1;
+							const roundedClass =
+								isSelectedStart || isSelectedEnd
+									? 'rounded-full'
+									: isInRange
+									? `${isFirstInRow ? 'rounded-l-full' : ''} ${isLastInRow ? 'rounded-r-full' : ''}`
+									: '';
+
 							return (
 								<div
 									key={day.toString()}
-									className="items-center justify-center"
+									className="flex-1 flex items-center justify-center"
 								>
 									<button
 										onClick={() => handleDateClick(day)}
 										disabled={isDisabled}
 										className={`w-10 h-10 text-sm transition-all duration-300 
                 ${isDisabled ? 'text-gray-400 cursor-not-allowed' : ''}
-                ${isSelectedStart ? 'bg-indigo-600 text-white rounded-l-full' : ''}
-                ${isSelectedEnd ? 'bg-indigo-600 text-white rounded-r-full' : ''}
-                ${isInRange && !isSelectedStart && !isSelectedEnd ? 'bg-indigo-300 text-white' : ''}
+                ${roundedClass}
+                ${isInRange ? 'bg-indigo-300 text-white' : ''}
+                ${isSelectedStart || isSelectedEnd ? 'bg-indigo-600 text-white' : ''}
                 ${!isSameMonth(day, currentMonth) ? 'text-gray-400' : 'text-gray-900 hover:bg-indigo-100 hover:text-indigo-600'}`}
 									>
 										{format(day, 'd')}
