@@ -39,7 +39,7 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [selectedYear, setSelectedYear] = useState(currentMonth.getFullYear());
 	const [range, setRange] = useState<{start: Date | null; end: Date | null}>({start: null, end: null});
-
+	const [hoverDate, setHoverDate] = useState<Date | null>(null);
 	useEffect(() => {
 		if (initialRange?.start || initialRange?.end) {
 			setRange(initialRange); // ✅ Recupera el rango seleccionado
@@ -79,6 +79,15 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 		} else {
 			setRange({start: range.start, end: day});
 		}
+	};
+	const handleMouseEnter = (day: Date) => {
+		if (range.start && !range.end) {
+			setHoverDate(day);
+		}
+	};
+
+	const handleMouseLeave = () => {
+		setHoverDate(null);
 	};
 
 	const handleAccept = () => {
@@ -149,6 +158,7 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 							const isSelectedStart = isSameDay(day, range.start);
 							const isSelectedEnd = isSameDay(day, range.end);
 							const isInRange = range.start && range.end && isWithinInterval(day, {start: range.start, end: range.end});
+							const isHovered = range.start && !range.end && hoverDate && isWithinInterval(day, {start: range.start, end: hoverDate});
 							// Bordes redondeados para los extremos de cada fila
 							const isFirstInRow = colIndex === 0;
 							const isLastInRow = colIndex === rowArray.length - 1;
@@ -162,20 +172,31 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 							return (
 								<div
 									key={day.toString()}
-									className="items-center justify-center"
+									className="items-center justify-center mb-[5px]"
 								>
 									<button
 										onClick={() => handleDateClick(day)}
+										onMouseEnter={() => handleMouseEnter(day)}
+										onMouseLeave={handleMouseLeave}
 										disabled={isDisabled}
-										className={`w-10 h-10 text-sm transition-all duration-300 
-                ${isDisabled ? 'text-gray-400 cursor-not-allowed' : ''}
-                    ${roundedClass}
-                ${isSelectedStart ? 'bg-indigo-600 text-white rounded-l-full' : ''}
-                ${isSelectedEnd ? 'bg-indigo-600 text-white rounded-r-full' : ''}
-                ${isInRange && !isSelectedStart && !isSelectedEnd ? 'bg-indigo-300 text-white' : ''}
-                ${!isSameMonth(day, currentMonth) ? 'text-gray-400' : 'text-gray-900 hover:bg-indigo-100 hover:text-indigo-600'}`}
+										className={` w-10 h-10 text-sm transition-all duration-300 flex items-center justify-center
+											${isDisabled ? 'text-gray-400 cursor-not-allowed' : ''}
+                                            ${roundedClass}
+											${isSelectedStart ? 'bg-indigo-200 rounded-l-full text-white ' : ''}
+											${isSelectedStart && isInRange ? 'bg-indigo-400  text-white ' : ''}
+											${isSelectedEnd ? 'bg-indigo-200 rounded-r-full text-white ' : ''}
+                                            ${isSelectedEnd && isInRange ? 'bg-indigo-400  text-white ' : ''}
+											${isInRange && !isSelectedStart && !isSelectedEnd ? 'bg-indigo-400 text-white' : ''}
+											${isHovered ? 'bg-indigo-200' : ''}
+											${!isSameMonth(day, currentMonth) ? 'text-gray-400' : 'text-gray-900 hover:bg-indigo-100 hover:text-indigo-600'}`}
 									>
-										{format(day, 'd')}
+										{isSelectedStart ? (
+											<div className="absolute w-10 h-10 flex items-center justify-center rounded-full bg-indigo-600 ">{format(day, 'd')}</div>
+										) : isSelectedEnd ? (
+											<div className="absolute w-10 h-10 flex items-center justify-center rounded-full bg-indigo-600 ">{format(day, 'd')}</div>
+										) : (
+											format(day, 'd')
+										)}
 									</button>
 								</div>
 							);
