@@ -23,7 +23,7 @@ const years = Array.from({length: 2025 - 1999 + 1}, (_, i) => 1999 + i);
 interface DatePickerCalendarProps {
 	disablePast?: boolean;
 	disableFuture?: boolean;
-	initialRange?: {start: Date | null; end: Date | null}; // ✅ Nueva prop
+	initialRange?: {start: Date | null; end: Date | null};
 	onClose: () => void;
 	onSelectRange: (range: {start: Date | null; end: Date | null}) => void;
 }
@@ -42,7 +42,7 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 	const [hoverDate, setHoverDate] = useState<Date | null>(null);
 	useEffect(() => {
 		if (initialRange?.start || initialRange?.end) {
-			setRange(initialRange); // ✅ Recupera el rango seleccionado
+			setRange(initialRange);
 		}
 	}, [initialRange]);
 
@@ -96,7 +96,7 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 	};
 
 	const handleCancel = () => {
-		setRange(initialRange || {start: null, end: null}); // ✅ No pierde la selección
+		setRange(initialRange || {start: null, end: null});
 		onClose();
 	};
 
