@@ -53,10 +53,9 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 
 	const prevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
 	const nextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));
-
 	const days = eachDayOfInterval({
-		start: startOfWeek(startOfMonth(currentMonth)),
-		end: endOfWeek(endOfMonth(currentMonth)),
+		start: startOfWeek(startOfMonth(currentMonth), {weekStartsOn: 1}),
+		end: endOfWeek(endOfMonth(currentMonth), {weekStartsOn: 1}),
 	});
 
 	const isDateDisabled = (date: Date) => {
@@ -83,6 +82,7 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 	const handleMouseEnter = (day: Date) => {
 		if (range.start && !range.end) {
 			setHoverDate(day);
+			console.log(range.start);
 		}
 	};
 
