@@ -40,6 +40,7 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 	const [selectedYear, setSelectedYear] = useState(currentMonth.getFullYear());
 	const [range, setRange] = useState<{start: Date | null; end: Date | null}>({start: null, end: null});
 	const [hoverDate, setHoverDate] = useState<Date | null>(null);
+	const [isHoverGreater, setisHoverGreater] = useState<boolean>();
 	useEffect(() => {
 		if (initialRange?.start || initialRange?.end) {
 			setRange(initialRange);
@@ -63,10 +64,12 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 		if (disableFuture && isAfter(date, today)) return true;
 		return false;
 	};
-	/* const isDateDisabled = (date: Date) => {
+	/* 
+    // Lo estoy usando para deshabilitar fechas anteriores a la seleccionada
+    const isDateDisabled = (date: Date) => {
 		if (disablePast && isBefore(date, today)) return true;
 		if (disableFuture && isAfter(date, today)) return true;
-		if (range.start && isBefore(date, range.start)) return true; // Deshabilita fechas anteriores a la seleccionada
+		if (range.start && isBefore(date, range.start)) return true; 
 		return false;
 	};
  */
@@ -82,7 +85,11 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 	const handleMouseEnter = (day: Date) => {
 		if (range.start && !range.end) {
 			setHoverDate(day);
-			console.log(range.start);
+			if (day > range.start) {
+				setisHoverGreater(true);
+			} else {
+				setisHoverGreater(false);
+			}
 		}
 	};
 
@@ -179,6 +186,7 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 									: isInRange
 									? `${isFirstInRow ? 'rounded-l-full' : ''} ${isLastInRow ? 'rounded-r-full' : ''}`
 									: '';
+
 							return (
 								<div
 									key={day.toString()}
@@ -193,9 +201,9 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 											${isDisabled ? 'text-gray-400 cursor-not-allowed' : ''}
                                             ${roundedClass}
                                             ${roundedClassLines}
-											${isSelectedStart ? 'bg-indigo-200 rounded-l-full text-white ' : ''}
-											${isSelectedStart && isInRange ? 'bg-indigo-400  text-white ' : ''}
-											${isSelectedEnd ? 'bg-indigo-200 rounded-r-full text-white ' : ''}
+											${isSelectedStart ? `bg-indigo-200  rounded-l-full text-white` : ''}
+											${isSelectedStart && isInRange ? `bg-indigo-400   text-white ` : ''}
+											${isSelectedEnd ? `bg-indigo-200  rounded-r-full text-white ` : ''}
                                             ${isSelectedEnd && isInRange ? 'bg-indigo-400  text-white ' : ''}
 											${isInRange && !isSelectedStart && !isSelectedEnd ? 'bg-indigo-400 text-white' : ''}
 											${isHovered ? 'bg-indigo-200' : ''}   
