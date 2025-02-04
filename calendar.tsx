@@ -155,20 +155,30 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 					>
 						{days.slice(rowIndex * 7, rowIndex * 7 + 7).map((day, colIndex, rowArray) => {
 							const isDisabled = isDateDisabled(day);
-							const isSelectedStart = isSameDay(day, range.start);
-							const isSelectedEnd = isSameDay(day, range.end);
-							const isInRange = range.start && range.end && isWithinInterval(day, {start: range.start, end: range.end});
+							const startDate = range.start && range.end && isAfter(range.start, range.end) ? range.end : range.start;
+							const endDate = range.start && range.end && isAfter(range.start, range.end) ? range.start : range.end;
+							const isSelectedStart = isSameDay(day, startDate);
+							const isSelectedEnd = isSameDay(day, endDate);
+							const isInRange = startDate && endDate && isWithinInterval(day, {start: startDate, end: endDate});
 							const isHovered = range.start && !range.end && hoverDate && isWithinInterval(day, {start: range.start, end: hoverDate});
-							// Bordes redondeados para los extremos de cada fila
+							/* 			const roundedClassHover = isHovered
+								? `${isSameDay(day, range.start) ? 'rounded-l-full' : ''} ${isSameDay(day, hoverDate) ? 'rounded-r-full' : ''}`
+								: ''; */
 							const isFirstInRow = colIndex === 0;
 							const isLastInRow = colIndex === rowArray.length - 1;
 							const roundedClass =
 								isSelectedStart || isSelectedEnd
 									? ''
 									: isInRange
-									? `${isFirstInRow ? 'rounded-l-full' : ''} ${isLastInRow ? 'rounded-r-full' : ''}`
+									? `${isSameDay(day, startDate) ? 'rounded-l-full' : ''} ${isSameDay(day, endDate) ? 'rounded-r-full' : ''}`
 									: '';
 
+							const roundedClassLines =
+								isSelectedStart || isSelectedEnd
+									? ''
+									: isInRange
+									? `${isFirstInRow ? 'rounded-l-full' : ''} ${isLastInRow ? 'rounded-r-full' : ''}`
+									: '';
 							return (
 								<div
 									key={day.toString()}
@@ -182,12 +192,13 @@ const DatePickerCalendar: React.FC<DatePickerCalendarProps> = ({
 										className={` w-10 h-10 text-sm transition-all duration-300 flex items-center justify-center
 											${isDisabled ? 'text-gray-400 cursor-not-allowed' : ''}
                                             ${roundedClass}
+                                            ${roundedClassLines}
 											${isSelectedStart ? 'bg-indigo-200 rounded-l-full text-white ' : ''}
 											${isSelectedStart && isInRange ? 'bg-indigo-400  text-white ' : ''}
 											${isSelectedEnd ? 'bg-indigo-200 rounded-r-full text-white ' : ''}
                                             ${isSelectedEnd && isInRange ? 'bg-indigo-400  text-white ' : ''}
 											${isInRange && !isSelectedStart && !isSelectedEnd ? 'bg-indigo-400 text-white' : ''}
-											${isHovered ? 'bg-indigo-200' : ''}
+											${isHovered ? 'bg-indigo-200' : ''}   
 											${!isSameMonth(day, currentMonth) ? 'text-gray-400' : 'text-gray-900 hover:bg-indigo-100 hover:text-indigo-600'}`}
 									>
 										{isSelectedStart ? (
